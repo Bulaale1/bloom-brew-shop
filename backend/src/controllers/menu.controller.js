@@ -4,7 +4,7 @@ const getAllMenu = (req,res)=>{
 const data = menuServices.getall();
 res.json(data);  
 }
-// getAllMenu();
+
 
 const getItemById = (req,res)=>{
     const {id} = req.params;
@@ -15,15 +15,17 @@ const getItemById = (req,res)=>{
     res.json(data);
  }
 
- //getItemById();
+
 
 const getByCategory= (req,res)=>{
     const {type} = req.params;
-    const data = menuServices.getByCategory(type);
+    
     const allowed = ['coffee','desserts','smoothies']
+
      if (!allowed.includes(type)){
         return res.status(404).json({error:'Category not found!'});
     }
+    const data = menuServices.getByCategory(type);
     res.json(data);
  };
 
