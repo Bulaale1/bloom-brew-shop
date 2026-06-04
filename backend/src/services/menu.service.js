@@ -1,19 +1,20 @@
 const cafeMenu = require('../data/menu');
-
+//CRUD OPERATION
 //Read
 //Get all items on the menu
 const getall  = () => cafeMenu;
-const allItems = Object.values(cafeMenu).flat();
+// Helper to dynamically get a fresh flat list of all items
+const getAllItemsFlat = () => Object.values(cafeMenu).flat();
 
 
 // Get an item based on id
 const getById = (id) => {
-  return allItems.find(item => item.id === id);
+  return getAllItemsFlat().find(item => item.id === id);
 };
 
 // get items by category
 const getByCategory = (category) =>{
-    return cafeMenu[category];
+    return cafeMenu[category] || [];
 };
 //End of read operation;
 
@@ -24,9 +25,13 @@ const createItem = (item) => {
   if (!cafeMenu[category]) {
     return null;
   }
+  const newItem = {
+    id: item.id || Date.now().toString(),
+    ...item
+  }
 
-  cafeMenu[category].push(item);
-  return item;
+  cafeMenu[category].push(newItem);
+  return newItem;
 };
 // UPDATE
 const updateItem = (id, updatedData) => {
