@@ -2,6 +2,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const menuRoutes = require('./src/routes/menu.routes');
+const ordersRoutes = require('./src/routes/orders.routes');
 
 // (A) - App initialization
 const app = express();
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/menu', menuRoutes);
+app.use('/api/orders', ordersRoutes);
 
 // (S) - Server initialization
 app.listen(port, () => {
