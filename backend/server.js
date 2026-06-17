@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const menuRoutes = require('./src/routes/menu.routes');
 const ordersRoutes = require('./src/routes/orders.routes');
+const cors = require('cors');
 
 // (A) - App initialization
 const app = express();
@@ -13,7 +14,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); // Standard practice to group static serving with middlewares
-
+app.use(cors());
 // (E) - Endpoints / Routes
 app.get('/', (req, res) => {
   res.json('Hello! the server is working!');
