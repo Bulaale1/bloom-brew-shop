@@ -1,34 +1,29 @@
-// (R) - Required dependencies
-const express = require('express');
-const morgan = require('morgan');
-const menuRoutes = require('./src/routes/menu.routes');
-const ordersRoutes = require('./src/routes/orders.routes');
-const cors = require('cors');
-const errorHandler = require('./src/middlewares/error.middleware');
+// Load environment variables before anything reads process.env.
+require('dotenv').config();
 
+const app = require('./app');
 
-
-// (A) - App initialization
-const app = express();
 const port = process.env.PORT || 3000;
 
-// (M) - Middleware setup
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
- // Standard practice to group static serving with middlewares
-app.use(express.static('public'));
-app.use(cors());
-// (E) - Endpoints / Routes
-app.get('/', (req, res) => {
-  res.json('Hello! the server is working!');
-});
-app.use('/api/menu', menuRoutes);
-app.use('/api/orders', ordersRoutes);
-app.use(errorHandler);
-
-// (S) - Server initialization
-app.listen(port, () => {
+const server = app.listen(port, () => {
   const now = new Date().toLocaleString();
   console.log(`[${now}]: Server is running on port ${port} ☕`);
+});
+
+// Graceful shutdown: stop accepting connections, then exit.
+const shutdown = (signal) => {
+  console.log(`\n${signal} received — shutting down gracefully.`);
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+// Safety net for any promise rejection that wasn't handled locally.
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+  server.close(() => process.exit(1));
 });
