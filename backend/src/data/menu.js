@@ -1,3 +1,4 @@
+// In-memory menu data store — replace with a database in production
 const cafeMenu = {
   coffee: [
     {
