@@ -1,6 +1,5 @@
 const pool = require('../db/pool');
-
-const ALLOWED_CATEGORIES = ['coffee', 'desserts', 'smoothies'];
+const ALLOWED_CATEGORIES = require('../constants/categories');
 
 const rowToItem = (row) => {
   const item = {
@@ -19,7 +18,7 @@ const rowToItem = (row) => {
 // READ
 const getall = async () => {
   const { rows } = await pool.query('SELECT * FROM menu_items ORDER BY category, id');
-  const grouped = {};
+  const grouped = Object.fromEntries(ALLOWED_CATEGORIES.map(c => [c, []]));
   for (const row of rows) {
     const item = rowToItem(row);
     if (!grouped[item.category]) grouped[item.category] = [];
@@ -41,7 +40,7 @@ const getByCategory = async (category) => {
   return rows.map(rowToItem);
 };
 
-// CREATE
+// CREATE — uses ON CONFLICT to avoid SELECT+INSERT TOCTOU race
 const createItem = async (item) => {
   const { name, category, priceCents, imagePath, available = true, variants, ingredients } = item;
 
@@ -49,19 +48,17 @@ const createItem = async (item) => {
 
   const newId = item.id ?? `${category}-${Date.now()}`;
 
-  const existing = await getById(newId);
-  if (existing) return null;
-
   const { rows } = await pool.query(
     `INSERT INTO menu_items (id, name, category, price_cents, image_path, available, variants, ingredients)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (id) DO NOTHING RETURNING *`,
     [
       newId, name, category, priceCents, imagePath ?? null, available,
       variants    ? JSON.stringify(variants)    : null,
       ingredients ? JSON.stringify(ingredients) : null,
     ]
   );
-  return rowToItem(rows[0]);
+  return rows.length ? rowToItem(rows[0]) : null;
 };
 
 // UPDATE

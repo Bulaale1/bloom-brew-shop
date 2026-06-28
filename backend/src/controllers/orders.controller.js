@@ -38,11 +38,10 @@ const updateOrderStatus = async (req, res, next) => {
     const { status } = req.body;
     if (!status) return res.status(400).json({ error: 'status is required' });
 
-    const exists = await ordersService.getById(id);
-    if (!exists) return res.status(404).json({ error: 'Order not found' });
-
     const result = await ordersService.updateStatus(id, status);
-    if (result.error) return res.status(400).json({ error: result.error });
+    if (result.error) {
+      return res.status(result.notFound ? 404 : 400).json({ error: result.error });
+    }
     res.json(result.order);
   } catch (err) {
     next(err);

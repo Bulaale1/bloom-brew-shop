@@ -42,6 +42,12 @@ const createOrder = async (items) => {
     }
 
     const { itemId, quantity } = line;
+
+    // Fix 7: explicit itemId presence check before hitting the DB
+    if (!itemId || typeof itemId !== 'string') {
+      return { error: 'Each order item must include a valid itemId' };
+    }
+
     const { rows } = await pool.query('SELECT * FROM menu_items WHERE id = $1', [itemId]);
 
     if (!rows.length) return { error: `Item '${itemId}' not found on menu` };
@@ -74,9 +80,11 @@ const createOrder = async (items) => {
   return { order: rowToOrder(rows[0]) };
 };
 
+// Fix 3: notFound flag lets the controller distinguish 404 from 400 without a pre-check.
+// Fix 1: rows.length guard after UPDATE handles TOCTOU where a concurrent DELETE wins.
 const updateStatus = async (id, status) => {
   const order = await getById(id);
-  if (!order) return { error: `Order with ID '${id}' not found` };
+  if (!order) return { error: `Order with ID '${id}' not found`, notFound: true };
 
   const allowed = TRANSITIONS[order.status];
   if (!allowed) return { error: `Unknown current status '${order.status}'` };
@@ -94,6 +102,8 @@ const updateStatus = async (id, status) => {
     'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
     [status, id]
   );
+  // Fix 1: concurrent DELETE between getById and UPDATE leaves rows empty
+  if (!rows.length) return { error: `Order with ID '${id}' not found`, notFound: true };
   return { order: rowToOrder(rows[0]) };
 };
 

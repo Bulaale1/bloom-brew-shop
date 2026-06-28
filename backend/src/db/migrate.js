@@ -50,23 +50,30 @@ async function migrate() {
 
   const { rows } = await pool.query('SELECT COUNT(*) FROM menu_items');
   if (parseInt(rows[0].count, 10) === 0) {
-    for (const item of SEED_MENU) {
-      await pool.query(
-        `INSERT INTO menu_items (id, name, category, price_cents, image_path, available, variants, ingredients)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [
-          item.id,
-          item.name,
-          item.category,
-          item.priceCents,
-          item.imagePath,
-          item.available,
-          item.variants    ? JSON.stringify(item.variants)    : null,
-          item.ingredients ? JSON.stringify(item.ingredients) : null,
-        ]
-      );
+    await pool.query('BEGIN');
+    try {
+      for (const item of SEED_MENU) {
+        await pool.query(
+          `INSERT INTO menu_items (id, name, category, price_cents, image_path, available, variants, ingredients)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            item.id,
+            item.name,
+            item.category,
+            item.priceCents,
+            item.imagePath,
+            item.available,
+            item.variants    ? JSON.stringify(item.variants)    : null,
+            item.ingredients ? JSON.stringify(item.ingredients) : null,
+          ]
+        );
+      }
+      await pool.query('COMMIT');
+      console.log(`Seeded ${SEED_MENU.length} menu items.`);
+    } catch (err) {
+      await pool.query('ROLLBACK');
+      throw err;
     }
-    console.log(`Seeded ${SEED_MENU.length} menu items.`);
   }
 }
 

@@ -1,4 +1,5 @@
 const menuServices = require('../services/menu.service');
+const ALLOWED_CATEGORIES = require('../constants/categories');
 
 const getAllMenu = async (req, res, next) => {
   try {
@@ -22,8 +23,7 @@ const getItemById = async (req, res, next) => {
 const getByCategory = async (req, res, next) => {
   try {
     const { type } = req.params;
-    const allowed = ['coffee', 'desserts', 'smoothies'];
-    if (!allowed.includes(type)) {
+    if (!ALLOWED_CATEGORIES.includes(type)) {
       return res.status(404).json({ error: 'Category not found!' });
     }
     const data = await menuServices.getByCategory(type);
