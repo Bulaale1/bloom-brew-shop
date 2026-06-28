@@ -1,89 +1,98 @@
-const cafeMenu = require('../data/menu');
+const pool = require('../db/pool');
 
-// READ OPERATIONS
-const getall = () => cafeMenu;
+const ALLOWED_CATEGORIES = ['coffee', 'desserts', 'smoothies'];
 
-// Optimized searching (no extra array allocation, short-circuits on match)
-const getById = (id) => {
-  for (const category in cafeMenu) {
-    const foundItem = cafeMenu[category].find(item => item.id === id);
-    if (foundItem) return foundItem;
-  }
-  return null;
+const rowToItem = (row) => {
+  const item = {
+    id:         row.id,
+    name:       row.name,
+    category:   row.category,
+    priceCents: row.price_cents,
+    imagePath:  row.image_path,
+    available:  row.available,
+  };
+  if (row.variants)    item.variants    = row.variants;
+  if (row.ingredients) item.ingredients = row.ingredients;
+  return item;
 };
 
-const getByCategory = (category) => {
-  return cafeMenu[category] || [];
+// READ
+const getall = async () => {
+  const { rows } = await pool.query('SELECT * FROM menu_items ORDER BY category, id');
+  const grouped = {};
+  for (const row of rows) {
+    const item = rowToItem(row);
+    if (!grouped[item.category]) grouped[item.category] = [];
+    grouped[item.category].push(item);
+  }
+  return grouped;
+};
+
+const getById = async (id) => {
+  const { rows } = await pool.query('SELECT * FROM menu_items WHERE id = $1', [id]);
+  return rows.length ? rowToItem(rows[0]) : null;
+};
+
+const getByCategory = async (category) => {
+  const { rows } = await pool.query(
+    'SELECT * FROM menu_items WHERE category = $1 ORDER BY id',
+    [category]
+  );
+  return rows.map(rowToItem);
 };
 
 // CREATE
-const createItem = (item) => {
-  const { category } = item;
+const createItem = async (item) => {
+  const { name, category, priceCents, imagePath, available = true, variants, ingredients } = item;
 
-  if (!cafeMenu[category]) return null;
+  if (!ALLOWED_CATEGORIES.includes(category)) return null;
 
-  const newId = item.id !== undefined ? item.id : Date.now().toString();
+  const newId = item.id ?? `${category}-${Date.now()}`;
 
-  if (getById(newId)) return null;
+  const existing = await getById(newId);
+  if (existing) return null;
 
-  const newItem = {
-    id: newId,
-    ...item
-  };
-
-  cafeMenu[category].push(newItem);
-  return newItem;
+  const { rows } = await pool.query(
+    `INSERT INTO menu_items (id, name, category, price_cents, image_path, available, variants, ingredients)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    [
+      newId, name, category, priceCents, imagePath ?? null, available,
+      variants    ? JSON.stringify(variants)    : null,
+      ingredients ? JSON.stringify(ingredients) : null,
+    ]
+  );
+  return rowToItem(rows[0]);
 };
 
 // UPDATE
-const updateItem = (id, updatedData) => {
-  const { category: newCategory, ...safeData } = updatedData;
+const updateItem = async (id, updatedData) => {
+  const existing = await getById(id);
+  if (!existing) return null;
 
-  for (const currentCategory in cafeMenu) {
-    const index = cafeMenu[currentCategory].findIndex(i => i.id === id);
-    if (index === -1) continue;
+  const merged = { ...existing, ...updatedData };
+  const targetCategory = ALLOWED_CATEGORIES.includes(merged.category)
+    ? merged.category
+    : existing.category;
 
-    const currentItem = cafeMenu[currentCategory][index];
-
-    // Relocate only if a different, valid category was requested; otherwise stay put.
-    const targetCategory =
-      newCategory && cafeMenu[newCategory] ? newCategory : currentCategory;
-
-    // FIXED: keep the item's own `category` field in sync with where it actually lives,
-    // so a relocated item never reports its old category.
-    const mergedItem = { ...currentItem, ...safeData, category: targetCategory };
-
-    if (targetCategory !== currentCategory) {
-      cafeMenu[currentCategory].splice(index, 1);
-      cafeMenu[targetCategory].push(mergedItem);
-    } else {
-      cafeMenu[currentCategory][index] = mergedItem;
-    }
-
-    return mergedItem;
-  }
-
-  return null;
+  const { rows } = await pool.query(
+    `UPDATE menu_items
+     SET name=$1, category=$2, price_cents=$3, image_path=$4, available=$5, variants=$6, ingredients=$7
+     WHERE id=$8 RETURNING *`,
+    [
+      merged.name, targetCategory, merged.priceCents, merged.imagePath ?? null,
+      merged.available,
+      merged.variants    ? JSON.stringify(merged.variants)    : null,
+      merged.ingredients ? JSON.stringify(merged.ingredients) : null,
+      id,
+    ]
+  );
+  return rows.length ? rowToItem(rows[0]) : null;
 };
 
 // DELETE
-const deleteItem = (id) => {
-  for (const category in cafeMenu) {
-    const index = cafeMenu[category].findIndex(i => i.id === id);
-
-    if (index !== -1) {
-      const deleted = cafeMenu[category].splice(index, 1);
-      return deleted[0];
-    }
-  }
-  return null;
+const deleteItem = async (id) => {
+  const { rows } = await pool.query('DELETE FROM menu_items WHERE id = $1 RETURNING *', [id]);
+  return rows.length ? rowToItem(rows[0]) : null;
 };
 
-module.exports = {
-  getall,
-  getById,
-  getByCategory,
-  createItem,
-  updateItem,
-  deleteItem
-};
+module.exports = { getall, getById, getByCategory, createItem, updateItem, deleteItem };

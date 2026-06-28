@@ -1,5 +1,6 @@
 // (R) - Required dependencies
 const express = require('express');
+const pool = require('./src/db/pool');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -43,9 +44,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'Bloom & Brew API' });
 });
 
-// Structured health check for uptime monitors and load balancers.
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+// Structured health check — also verifies DB connectivity.
+app.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch {
+    res.status(503).json({ status: 'error', db: 'unreachable' });
+  }
 });
 
 app.use('/api/menu', menuRoutes);

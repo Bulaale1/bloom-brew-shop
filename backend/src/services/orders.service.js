@@ -1,47 +1,35 @@
-/**
- * Orders service layer.
- *
- * Every public function returns a result envelope:
- *   - success: { order }  (getAll returns the raw collection)
- *   - failure: { error: <message> }
- */
+const pool = require('../db/pool');
 
-const orders = require('../data/orders');
-const cafeMenu = require('../data/menu');
-
-/**
- * Find a menu item by id across every category.
- * @param {string} id
- * @returns {object|null} the menu item, or null if no category contains it
- */
-const findMenuItemById = (id) => {
-  for (const category in cafeMenu) {
-    const found = cafeMenu[category].find(item => item.id === id);
-    if (found) return found;
-  }
-  return null;
+const TRANSITIONS = {
+  pending:   ['preparing', 'cancelled'],
+  preparing: ['ready',     'cancelled'],
+  ready:     ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
 };
 
-/** @returns {object[]} the live orders collection */
-const getAll = () => orders;
+const rowToOrder = (row) => ({
+  id:         row.id,
+  items:      row.items,
+  totalCents: row.total_cents,
+  status:     row.status,
+  createdAt:  row.created_at,
+});
 
-/**
- * @param {string} id
- * @returns {object|null} the matching order, or null if none exists
- */
-const getById = (id) => orders.find(order => order.id === id) || null;
-
-// Random suffix avoids id collisions when orders are created in the same millisecond.
 const generateOrderId = () =>
   `order-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-/**
- * Create an order from a list of { itemId, quantity } lines.
- * Validates every line before writing anything, so a bad line leaves the store untouched.
- * @param {{ itemId: string, quantity: number }[]} items
- * @returns {{ order: object } | { error: string }}
- */
-const createOrder = (items) => {
+const getAll = async () => {
+  const { rows } = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+  return rows.map(rowToOrder);
+};
+
+const getById = async (id) => {
+  const { rows } = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
+  return rows.length ? rowToOrder(rows[0]) : null;
+};
+
+const createOrder = async (items) => {
   if (!Array.isArray(items) || items.length === 0) {
     return { error: 'Order must contain at least one item' };
   }
@@ -54,11 +42,11 @@ const createOrder = (items) => {
     }
 
     const { itemId, quantity } = line;
-    const menuItem = findMenuItemById(itemId);
+    const { rows } = await pool.query('SELECT * FROM menu_items WHERE id = $1', [itemId]);
 
-    if (!menuItem) return { error: `Item '${itemId}' not found on menu` };
+    if (!rows.length) return { error: `Item '${itemId}' not found on menu` };
 
-    // Block only items explicitly flagged unavailable; a missing flag means orderable.
+    const menuItem = rows[0];
     if (menuItem.available === false) {
       return { error: `'${menuItem.name}' is not currently available` };
     }
@@ -67,46 +55,27 @@ const createOrder = (items) => {
       return { error: `Invalid quantity for item '${itemId}'` };
     }
 
-    // Snapshot name and price onto the order so it reflects the cost at purchase
-    // time, even if the menu item is later renamed or repriced.
     resolvedItems.push({
       itemId,
-      name: menuItem.name,
+      name:       menuItem.name,
       quantity,
-      priceCents: menuItem.priceCents
+      priceCents: menuItem.price_cents,
     });
   }
 
   const totalCents = resolvedItems.reduce((sum, i) => sum + i.priceCents * i.quantity, 0);
+  const id = generateOrderId();
 
-  const newOrder = {
-    id: generateOrderId(),
-    items: resolvedItems,
-    totalCents,
-    status: 'pending',
-    createdAt: new Date().toISOString()
-  };
-
-  orders.push(newOrder);
-  return { order: newOrder };
+  const { rows } = await pool.query(
+    `INSERT INTO orders (id, items, total_cents, status, created_at)
+     VALUES ($1, $2, $3, 'pending', NOW()) RETURNING *`,
+    [id, JSON.stringify(resolvedItems), totalCents]
+  );
+  return { order: rowToOrder(rows[0]) };
 };
 
-const TRANSITIONS = {
-  pending:    ['preparing', 'cancelled'],
-  preparing:  ['ready',     'cancelled'],
-  ready:      ['completed', 'cancelled'],
-  completed:  [],
-  cancelled:  [],
-};
-
-/**
- * Update an order's status.
- * @param {string} id
- * @param {string} status - must be a valid next state from the current status
- * @returns {{ order: object } | { error: string }}
- */
-const updateStatus = (id, status) => {
-  const order = orders.find(o => o.id === id);
+const updateStatus = async (id, status) => {
+  const order = await getById(id);
   if (!order) return { error: `Order with ID '${id}' not found` };
 
   const allowed = TRANSITIONS[order.status];
@@ -121,21 +90,17 @@ const updateStatus = (id, status) => {
     };
   }
 
-  order.status = status;
-  return { order };
+  const { rows } = await pool.query(
+    'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
+    [status, id]
+  );
+  return { order: rowToOrder(rows[0]) };
 };
 
-/**
- * Remove an order from the store.
- * @param {string} id
- * @returns {{ order: object } | { error: string }} the deleted order, or an error
- */
-const deleteOrder = (id) => {
-  const index = orders.findIndex(o => o.id === id);
-  if (index === -1) return { error: `Order with ID '${id}' not found or already deleted` };
-
-  const deleted = orders.splice(index, 1)[0];
-  return { order: deleted };
+const deleteOrder = async (id) => {
+  const { rows } = await pool.query('DELETE FROM orders WHERE id = $1 RETURNING *', [id]);
+  if (!rows.length) return { error: `Order with ID '${id}' not found or already deleted` };
+  return { order: rowToOrder(rows[0]) };
 };
 
 module.exports = { getAll, getById, createOrder, updateStatus, deleteOrder };

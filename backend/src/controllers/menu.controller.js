@@ -1,88 +1,73 @@
 const menuServices = require('../services/menu.service');
 
-const getAllMenu = (req,res)=>{
-const data = menuServices.getall();
-res.json(data);  
-}
-
-
-const getItemById = (req,res)=>{
-    const {id} = req.params;
-    const data = menuServices.getById(id);
-    if (!data){
-        return res.status(404).json({error:'Item not found!'});
-    }
+const getAllMenu = async (req, res, next) => {
+  try {
+    const data = await menuServices.getall();
     res.json(data);
- }
+  } catch (err) {
+    next(err);
+  }
+};
 
-
-
-const getByCategory= (req,res)=>{
-    const {type} = req.params;
-    
-    const allowed = ['coffee','desserts','smoothies']
-
-     if (!allowed.includes(type)){
-        return res.status(404).json({error:'Category not found!'});
-    }
-    const data = menuServices.getByCategory(type);
+const getItemById = async (req, res, next) => {
+  try {
+    const data = await menuServices.getById(req.params.id);
+    if (!data) return res.status(404).json({ error: 'Item not found!' });
     res.json(data);
- };
-
- // CREATE
-const createMenuItem = (req, res) => {
-  const item = req.body;
-
-  if (!item.category) {
-    return res.status(400).json({ error: 'Category is required' });
+  } catch (err) {
+    next(err);
   }
-
-  const created = menuServices.createItem(item);
-
-  if (!created) {
-    return res.status(400).json({ error: 'Invalid category' });
-  }
-
-  res.status(201).json(created);
 };
 
-// UPDATE
-const updateMenuItem = (req, res) => {
-  const { id } = req.params;
-  const updatedData = req.body;
-
-  const updated = menuServices.updateItem(id, updatedData);
-
-  if (!updated) {
-    return res.status(404).json({ error: 'Item not found' });
+const getByCategory = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    const allowed = ['coffee', 'desserts', 'smoothies'];
+    if (!allowed.includes(type)) {
+      return res.status(404).json({ error: 'Category not found!' });
+    }
+    const data = await menuServices.getByCategory(type);
+    res.json(data);
+  } catch (err) {
+    next(err);
   }
-
-  res.json(updated);
 };
 
-// DELETE
-const deleteMenuItem = (req, res) => {
-  const { id } = req.params;
-
-  const deleted = menuServices.deleteItem(id);
-
-  if (!deleted) {
-    return res.status(404).json({ error: 'Item not found' });
+const createMenuItem = async (req, res, next) => {
+  try {
+    const item = req.body;
+    if (!item.category) {
+      return res.status(400).json({ error: 'Category is required' });
+    }
+    const created = await menuServices.createItem(item);
+    if (!created) {
+      return res.status(400).json({ error: 'Invalid category or duplicate item ID' });
+    }
+    res.status(201).json(created);
+  } catch (err) {
+    next(err);
   }
-
-  res.json({ message: 'Item deleted', deleted });
 };
 
+const updateMenuItem = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updated = await menuServices.updateItem(id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Item not found' });
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+};
 
+const deleteMenuItem = async (req, res, next) => {
+  try {
+    const deleted = await menuServices.deleteItem(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Item not found' });
+    res.json({ message: 'Item deleted', deleted });
+  } catch (err) {
+    next(err);
+  }
+};
 
- module.exports = {
-    getAllMenu,
-    getItemById,
-    getByCategory,
-    createMenuItem,
-    updateMenuItem,
-    deleteMenuItem
- };
-
-
-
+module.exports = { getAllMenu, getItemById, getByCategory, createMenuItem, updateMenuItem, deleteMenuItem };
