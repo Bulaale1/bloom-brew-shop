@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
-import { getMenu } from './api/menu'
+import { useState, useEffect, useCallback } from 'react'
+import { getMenu, searchMenu } from './api/menu'
 import { createOrder } from './api/orders'
 import Header from './components/Header'
+import SearchBar from './components/SearchBar'
 import CategoryTabs from './components/CategoryTabs'
 import MenuGrid from './components/MenuGrid'
 import Cart from './components/Cart'
@@ -12,7 +13,10 @@ export default function App() {
   const [menu, setMenu] = useState(null)
   const [menuError, setMenuError] = useState(null)
   const [activeCategory, setActiveCategory] = useState('coffee')
-  const [cart, setCart] = useState({})        // { itemId: { item, quantity } }
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState(null)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [cart, setCart] = useState({})
   const [cartOpen, setCartOpen] = useState(false)
   const [order, setOrder] = useState(null)
   const [placing, setPlacing] = useState(false)
@@ -23,6 +27,24 @@ export default function App() {
       .then(setMenu)
       .catch((err) => setMenuError(err.message))
   }, [])
+
+  const handleSearch = useCallback((q) => {
+    setSearchQuery(q)
+    if (!q.trim()) {
+      setSearchResults(null)
+      return
+    }
+    setSearchLoading(true)
+    searchMenu(q)
+      .then(setSearchResults)
+      .catch(() => setSearchResults([]))
+      .finally(() => setSearchLoading(false))
+  }, [])
+
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSearchResults(null)
+  }
 
   const cartCount = Object.values(cart).reduce((sum, { quantity }) => sum + quantity, 0)
   const cartTotal = Object.values(cart).reduce(
@@ -85,10 +107,13 @@ export default function App() {
 
       <main className="main">
         {menuError && <p className="error-banner">{menuError}</p>}
-        <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
+        <SearchBar value={searchQuery} onChange={handleSearch} onClear={clearSearch} />
+        {searchResults === null && (
+          <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
+        )}
         <MenuGrid
-          items={menu?.[activeCategory] ?? []}
-          loading={!menu && !menuError}
+          items={searchResults ?? menu?.[activeCategory] ?? []}
+          loading={searchResults === null ? (!menu && !menuError) : searchLoading}
           cart={cart}
           onAdd={addToCart}
         />
