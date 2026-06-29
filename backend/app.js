@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 
 const menuRoutes = require('./src/routes/menu.routes');
 const ordersRoutes = require('./src/routes/orders.routes');
+const authRoutes = require('./src/routes/auth.routes');
 const errorHandler = require('./src/middlewares/error.middleware');
 
 // (A) - App initialization
@@ -54,6 +55,7 @@ app.get('/health', async (req, res) => {
   }
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', ordersRoutes);
 
