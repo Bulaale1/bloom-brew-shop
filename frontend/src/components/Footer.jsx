@@ -1,6 +1,5 @@
-const YEAR = new Date().getFullYear()
-
 export default function Footer() {
+  const year = new Date().getFullYear()
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -59,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="footer__bottom">
-        <p className="footer__copy">&copy; {YEAR} Bloom &amp; Brew. All rights reserved.</p>
+        <p className="footer__copy">&copy; {year} Bloom &amp; Brew. All rights reserved.</p>
         <p className="footer__made">Made with ☕ &amp; love</p>
       </div>
     </footer>
