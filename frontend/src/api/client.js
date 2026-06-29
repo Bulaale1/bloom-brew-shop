@@ -1,9 +1,15 @@
 const BASE = '/api';
 
+const getToken = () => localStorage.getItem('bb_token');
+
 async function request(path, options = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
+    headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
 
