@@ -565,6 +565,128 @@
   to   { opacity: 1; }
 }
 
+/* ── Admin Dashboard ── */
+.dashboard {
+  flex: 1;
+  padding: 32px 24px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.dashboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.dashboard__title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--brew-text);
+}
+
+.dashboard__logout {
+  background: none;
+  border: 2px solid var(--brew-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brew-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dashboard__logout:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.dashboard__section {
+  margin-bottom: 40px;
+}
+
+.dashboard__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brew-text);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--brew-border);
+}
+
+.dashboard__form { display: flex; flex-direction: column; gap: 16px; }
+
+.dashboard__form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .dashboard__form-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .dashboard__form-row { grid-template-columns: 1fr; }
+}
+
+.dashboard__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brew-text);
+}
+
+.dashboard__optional { color: var(--brew-muted); font-weight: 400; font-size: 12px; }
+
+.dashboard__add-btn { align-self: flex-start; padding: 11px 28px; }
+
+.dashboard__loading { color: var(--brew-muted); font-size: 14px; }
+
+.dashboard__table-wrap { overflow-x: auto; }
+
+.dashboard__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.dashboard__table th,
+.dashboard__table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--brew-border);
+}
+.dashboard__table th {
+  background: var(--brew-bg);
+  font-weight: 600;
+  color: var(--brew-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.dashboard__table tbody tr:hover { background: var(--brew-bg); }
+
+.dashboard__cat {
+  color: var(--brew-muted);
+  text-transform: capitalize;
+}
+
+.dashboard__delete-btn {
+  background: none;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #b91c1c;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dashboard__delete-btn:hover:not(:disabled) { background: #fef2f2; }
+.dashboard__delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* ── Order confirmation ── */
 .confirmation {
   flex: 1;
