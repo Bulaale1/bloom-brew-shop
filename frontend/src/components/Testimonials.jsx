@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+const CARD_WIDTH_NARROW = 220 // used below 520px
+const CARD_GAP = 20
+const BREAKPOINT = 520
+
+const getCardStep = () =>
+  typeof window !== 'undefined' && window.innerWidth <= BREAKPOINT
+    ? CARD_WIDTH_NARROW + CARD_GAP
+    : 300 + CARD_GAP
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const TESTIMONIALS = [
   {
     id: 1,
@@ -83,7 +96,6 @@ const TESTIMONIALS = [
   },
 ]
 
-const CARD_STEP = 320 // card width (300) + gap (20)
 const N = TESTIMONIALS.length
 
 const Stars = ({ count }) => (
@@ -110,14 +122,44 @@ const Card = ({ t }) => (
 
 export default function Testimonials() {
   const [current, setCurrent] = useState(0)
+  const [noTransition, setNoTransition] = useState(false)
+  const [cardStep, setCardStep] = useState(getCardStep)
   const timerRef = useRef(null)
+  const currentRef = useRef(0)
+
+  // Keep a ref mirror of current so the setInterval closure can read the latest value
+  const safeSetCurrent = useCallback((next) => {
+    currentRef.current = next
+    setCurrent(next)
+  }, [])
+
+  // Re-enable CSS transition two frames after a wrap-jump (so the instant position change paints first)
+  useEffect(() => {
+    if (!noTransition) return
+    const id1 = requestAnimationFrame(() => {
+      const id2 = requestAnimationFrame(() => setNoTransition(false))
+      return () => cancelAnimationFrame(id2)
+    })
+    return () => cancelAnimationFrame(id1)
+  }, [noTransition])
+
+  // Update card step on resize so translate offsets stay correct on narrow screens
+  useEffect(() => {
+    const update = () => setCardStep(getCardStep())
+    window.addEventListener('resize', update, { passive: true })
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   const startTimer = useCallback(() => {
     clearInterval(timerRef.current)
+    if (prefersReducedMotion()) return
     timerRef.current = setInterval(() => {
-      setCurrent((c) => (c + 1) % N)
+      const c = currentRef.current
+      const next = (c + 1) % N
+      if (c === N - 1) setNoTransition(true) // suppress wrap animation
+      safeSetCurrent(next)
     }, 3500)
-  }, [])
+  }, [safeSetCurrent])
 
   useEffect(() => {
     startTimer()
@@ -125,7 +167,12 @@ export default function Testimonials() {
   }, [startTimer])
 
   const go = (dir) => {
-    setCurrent((c) => (c + dir + N) % N)
+    const c = currentRef.current
+    const next = (c + dir + N) % N
+    if ((dir === 1 && c === N - 1) || (dir === -1 && c === 0)) {
+      setNoTransition(true) // suppress wrap animation
+    }
+    safeSetCurrent(next)
     startTimer()
   }
 
@@ -145,7 +192,10 @@ export default function Testimonials() {
         <div className="testimonials__viewport">
           <div
             className="testimonials__track"
-            style={{ transform: `translateX(-${current * CARD_STEP}px)` }}
+            style={{
+              transform: `translateX(-${current * cardStep}px)`,
+              transition: noTransition ? 'none' : undefined,
+            }}
           >
             {TESTIMONIALS.map((t) => <Card key={t.id} t={t} />)}
           </div>
@@ -165,7 +215,7 @@ export default function Testimonials() {
           <button
             key={t.id}
             className={`testimonials__dot${i === current ? ' testimonials__dot--active' : ''}`}
-            onClick={() => { setCurrent(i); startTimer() }}
+            onClick={() => { safeSetCurrent(i); startTimer() }}
             aria-label={`Go to testimonial ${i + 1}`}
             aria-selected={i === current}
             role="tab"
