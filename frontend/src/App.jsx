@@ -10,6 +10,7 @@ import OrderConfirmation from './components/OrderConfirmation'
 import LoginModal from './components/LoginModal'
 import Dashboard from './components/Dashboard'
 import Testimonials from './components/Testimonials'
+import Hero from './components/Hero'
 import './App.css'
 
 export default function App() {
@@ -147,7 +148,11 @@ export default function App() {
     <>
       {sharedHeader}
 
-      <main className="main">
+      {searchResults === null && (
+        <Hero onShopNow={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })} />
+      )}
+
+      <main className="main" id="menu-section">
         {menuError && <p className="error-banner">{menuError}</p>}
         <SearchBar value={searchQuery} onChange={handleSearch} onClear={clearSearch} />
         {searchResults === null && (
