@@ -1,4 +1,5 @@
 const pool = require('./pool');
+const bcrypt = require('bcryptjs');
 
 const SEED_MENU = [
   { id: 'coffee-espresso',       name: 'Espresso',              category: 'coffee',    priceCents: 300,  imagePath: '/images/coffee/espresso.jpg',        available: true },
@@ -27,6 +28,13 @@ const SEED_MENU = [
 
 async function migrate() {
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id           SERIAL PRIMARY KEY,
+      username     TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS menu_items (
       id          TEXT PRIMARY KEY,
       name        TEXT NOT NULL,
@@ -47,6 +55,19 @@ async function migrate() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
   `);
+
+  // Seed default admin if none exists
+  const { rows: adminRows } = await pool.query('SELECT COUNT(*) FROM admin_users');
+  if (parseInt(adminRows[0].count, 10) === 0) {
+    const username = process.env.ADMIN_USERNAME || 'admin';
+    const password = process.env.ADMIN_PASSWORD || 'bloom2024';
+    const hash = await bcrypt.hash(password, 12);
+    await pool.query(
+      'INSERT INTO admin_users (username, password_hash) VALUES ($1, $2)',
+      [username, hash]
+    );
+    console.log(`Seeded admin user: "${username}"`);
+  }
 
   const { rows } = await pool.query('SELECT COUNT(*) FROM menu_items');
   if (parseInt(rows[0].count, 10) === 0) {
