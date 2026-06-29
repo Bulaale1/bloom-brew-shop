@@ -827,6 +827,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .testimonials__track { transition: none; }
+  .hero__emoji { animation: none; }
+  .testimonials__dot,
+  .testimonials__arrow { transition: none; }
 }
 
 .testimonial {
