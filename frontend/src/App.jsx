@@ -143,31 +143,34 @@ export default function App() {
       <>
         {sharedHeader}
         <Dashboard onLogout={handleLogout} />
+        <Footer />
       </>
     )
   }
+
+  const isDefaultView = searchResults === null
 
   return (
     <>
       {sharedHeader}
 
-      {searchResults === null && (
+      {isDefaultView && (
         <Hero onShopNow={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })} />
       )}
 
       <main className="main" id="menu-section">
         {menuError && <p className="error-banner">{menuError}</p>}
         <SearchBar value={searchQuery} onChange={handleSearch} onClear={clearSearch} />
-        {searchResults === null && (
+        {isDefaultView && (
           <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
         )}
         <MenuGrid
           items={searchResults ?? menu?.[activeCategory] ?? []}
-          loading={searchResults === null ? (!menu && !menuError) : searchLoading}
+          loading={isDefaultView ? (!menu && !menuError) : searchLoading}
           cart={cart}
           onAdd={addToCart}
         />
-        {searchResults === null && <Testimonials />}
+        {isDefaultView && <Testimonials />}
       </main>
 
       <Cart
@@ -189,7 +192,7 @@ export default function App() {
         <LoginModal onSuccess={handleLoginSuccess} onClose={() => setShowLogin(false)} />
       )}
 
-      {searchResults === null && <AboutUs />}
+      {isDefaultView && <AboutUs />}
       <Footer />
     </>
   )
