@@ -9,6 +9,7 @@ import Cart from './components/Cart'
 import OrderConfirmation from './components/OrderConfirmation'
 import LoginModal from './components/LoginModal'
 import Dashboard from './components/Dashboard'
+import Testimonials from './components/Testimonials'
 import './App.css'
 
 export default function App() {
@@ -158,6 +159,7 @@ export default function App() {
           cart={cart}
           onAdd={addToCart}
         />
+        {searchResults === null && <Testimonials />}
       </main>
 
       <Cart
