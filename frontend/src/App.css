@@ -28,6 +28,31 @@
   color: #fff;
 }
 
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header__admin-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px;
+  color: #fff;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.header__admin-btn:hover { background: rgba(255,255,255,0.25); }
+.header__admin-btn--muted {
+  background: transparent;
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+}
+.header__admin-btn--muted:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
 .header__cart-btn {
   position: relative;
   background: rgba(255,255,255,0.1);

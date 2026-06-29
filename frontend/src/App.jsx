@@ -7,9 +7,26 @@ import CategoryTabs from './components/CategoryTabs'
 import MenuGrid from './components/MenuGrid'
 import Cart from './components/Cart'
 import OrderConfirmation from './components/OrderConfirmation'
+import LoginModal from './components/LoginModal'
+import Dashboard from './components/Dashboard'
 import './App.css'
 
 export default function App() {
+  const [isAdmin, setIsAdmin] = useState(() => !!localStorage.getItem('bb_token'))
+  const [showLogin, setShowLogin] = useState(false)
+  const [showDashboard, setShowDashboard] = useState(false)
+
+  const handleLoginSuccess = () => {
+    setIsAdmin(true)
+    setShowLogin(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('bb_token')
+    setIsAdmin(false)
+    setShowDashboard(false)
+  }
+
   const [menu, setMenu] = useState(null)
   const [menuError, setMenuError] = useState(null)
   const [activeCategory, setActiveCategory] = useState('coffee')
@@ -92,18 +109,42 @@ export default function App() {
     }
   }
 
+  const sharedHeader = (
+    <Header
+      cartCount={cartCount}
+      onCartClick={() => setCartOpen(true)}
+      isAdmin={isAdmin}
+      onDashboard={() => setShowDashboard(true)}
+      onLoginClick={() => setShowLogin(true)}
+      onLogout={handleLogout}
+    />
+  )
+
   if (order) {
     return (
       <>
-        <Header cartCount={0} onCartClick={() => {}} />
+        <Header cartCount={0} onCartClick={() => {}} isAdmin={isAdmin}
+          onDashboard={() => setShowDashboard(true)}
+          onLoginClick={() => setShowLogin(true)}
+          onLogout={handleLogout}
+        />
         <OrderConfirmation order={order} onNewOrder={() => setOrder(null)} />
+      </>
+    )
+  }
+
+  if (showDashboard && isAdmin) {
+    return (
+      <>
+        {sharedHeader}
+        <Dashboard onLogout={handleLogout} />
       </>
     )
   }
 
   return (
     <>
-      <Header cartCount={cartCount} onCartClick={() => setCartOpen(true)} />
+      {sharedHeader}
 
       <main className="main">
         {menuError && <p className="error-banner">{menuError}</p>}
@@ -132,6 +173,10 @@ export default function App() {
 
       {cartOpen && (
         <div className="overlay" onClick={() => setCartOpen(false)} aria-hidden="true" />
+      )}
+
+      {showLogin && (
+        <LoginModal onSuccess={handleLoginSuccess} onClose={() => setShowLogin(false)} />
       )}
     </>
   )
