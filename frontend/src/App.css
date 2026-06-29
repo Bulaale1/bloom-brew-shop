@@ -78,6 +78,105 @@
   font-size: 14px;
 }
 
+/* ── Login modal ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(45,26,14,0.55);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fade-in 0.15s ease;
+}
+
+.modal {
+  background: var(--brew-surface);
+  border-radius: var(--brew-radius);
+  box-shadow: 0 20px 60px rgba(45,26,14,0.25);
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.modal__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brew-text);
+}
+
+.modal__close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--brew-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.modal__close:hover { background: var(--brew-bg); }
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 24px;
+}
+
+.modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brew-text);
+}
+
+.modal__input {
+  padding: 10px 12px;
+  border: 2px solid var(--brew-border);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--brew-text);
+  background: var(--brew-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modal__input:focus { border-color: var(--brew-amber); }
+
+.modal__error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.modal__submit {
+  background: var(--brew-brown);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+.modal__submit:hover:not(:disabled) { background: var(--brew-amber); }
+.modal__submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
 /* ── Search bar ── */
 .search-bar {
   position: relative;
