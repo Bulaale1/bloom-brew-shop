@@ -840,6 +840,147 @@
   .testimonials__track { animation: none; }
 }
 
+/* ── Footer ── */
+.footer {
+  background: var(--brew-header);
+  color: rgba(255,255,255,0.75);
+  margin-top: auto;
+}
+
+.footer__inner {
+  display: flex;
+  gap: 48px;
+  padding: 52px 48px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer__brand {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 200px;
+}
+
+.footer__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer__logo-icon { font-size: 24px; }
+
+.footer__logo-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.footer__tagline {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.55);
+}
+
+.footer__socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.footer__social {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.footer__social:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+}
+
+.footer__links {
+  flex: 2;
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 120px;
+}
+
+.footer__col-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+.footer__col-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer__link {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.footer__link:hover { color: #fff; }
+
+.footer__detail {
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+}
+
+.footer__bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 18px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer__copy,
+.footer__made {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+}
+
+@media (max-width: 780px) {
+  .footer__inner {
+    flex-direction: column;
+    padding: 40px 24px 32px;
+    gap: 32px;
+  }
+  .footer__bottom {
+    flex-direction: column;
+    text-align: center;
+    padding: 18px 24px;
+    gap: 4px;
+  }
+}
+
 /* ── Admin Dashboard ── */
 .dashboard {
   flex: 1;
