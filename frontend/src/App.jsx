@@ -12,6 +12,7 @@ import Dashboard from './components/Dashboard'
 import Testimonials from './components/Testimonials'
 import Hero from './components/Hero'
 import Footer from './components/Footer'
+import AboutUs from './components/AboutUs'
 import './App.css'
 
 export default function App() {
@@ -188,6 +189,7 @@ export default function App() {
         <LoginModal onSuccess={handleLoginSuccess} onClose={() => setShowLogin(false)} />
       )}
 
+      {searchResults === null && <AboutUs />}
       <Footer />
     </>
   )
