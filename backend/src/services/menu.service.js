@@ -86,10 +86,19 @@ const updateItem = async (id, updatedData) => {
   return rows.length ? rowToItem(rows[0]) : null;
 };
 
+// SEARCH
+const searchItems = async (query) => {
+  const { rows } = await pool.query(
+    'SELECT * FROM menu_items WHERE name ILIKE $1 ORDER BY category, id',
+    [`%${query}%`]
+  );
+  return rows.map(rowToItem);
+};
+
 // DELETE
 const deleteItem = async (id) => {
   const { rows } = await pool.query('DELETE FROM menu_items WHERE id = $1 RETURNING *', [id]);
   return rows.length ? rowToItem(rows[0]) : null;
 };
 
-module.exports = { getall, getById, getByCategory, createItem, updateItem, deleteItem };
+module.exports = { getall, getById, getByCategory, searchItems, createItem, updateItem, deleteItem };

@@ -33,6 +33,17 @@ const getByCategory = async (req, res, next) => {
   }
 };
 
+const searchMenu = async (req, res, next) => {
+  try {
+    const q = (req.query.q ?? '').trim();
+    if (!q) return res.status(400).json({ error: 'Query parameter "q" is required' });
+    const data = await menuServices.searchItems(q);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createMenuItem = async (req, res, next) => {
   try {
     const item = req.body;
@@ -70,4 +81,4 @@ const deleteMenuItem = async (req, res, next) => {
   }
 };
 
-module.exports = { getAllMenu, getItemById, getByCategory, createMenuItem, updateMenuItem, deleteMenuItem };
+module.exports = { getAllMenu, getItemById, getByCategory, searchMenu, createMenuItem, updateMenuItem, deleteMenuItem };
