@@ -840,6 +840,124 @@
   .testimonials__track { animation: none; }
 }
 
+/* ── About Us ── */
+.about {
+  background: var(--brew-surface);
+  border-top: 2px solid var(--brew-border);
+}
+
+.about__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  padding: 72px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.about__eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brew-amber);
+  margin-bottom: 12px;
+}
+
+.about__title {
+  font-size: clamp(26px, 3.5vw, 40px);
+  font-weight: 800;
+  color: var(--brew-text);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+
+.about__body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--brew-muted);
+  margin-bottom: 16px;
+}
+
+.about__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 2px solid var(--brew-border);
+}
+
+.about__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about__stat-number {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--brew-brown);
+  line-height: 1;
+}
+
+.about__stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brew-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+/* values column */
+.about__values {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 8px;
+}
+
+.about__value {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.about__value-icon {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.about__value-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--brew-text);
+  margin-bottom: 6px;
+}
+
+.about__value-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--brew-muted);
+}
+
+@media (max-width: 780px) {
+  .about__inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 52px 24px;
+  }
+  .about__stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
 /* ── Footer ── */
 .footer {
   background: var(--brew-header);
