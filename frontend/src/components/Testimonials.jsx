@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+
 const TESTIMONIALS = [
   {
     id: 1,
@@ -76,10 +78,13 @@ const TESTIMONIALS = [
     name: 'Yuki H.',
     initials: 'YH',
     rating: 5,
-    text: 'The Affogato is a must-try — espresso poured over something magical. Simple, elegant, and absolutely satisfying. I\'m a regular now.',
+    text: "The Affogato is a must-try — espresso poured over something magical. Simple, elegant, and absolutely satisfying. I'm a regular now.",
     date: 'June 2026',
   },
 ]
+
+const CARD_STEP = 320 // card width (300) + gap (20)
+const N = TESTIMONIALS.length
 
 const Stars = ({ count }) => (
   <div className="testimonial__stars" aria-label={`${count} out of 5 stars`}>
@@ -104,15 +109,68 @@ const Card = ({ t }) => (
 )
 
 export default function Testimonials() {
+  const [current, setCurrent] = useState(0)
+  const timerRef = useRef(null)
+
+  const startTimer = useCallback(() => {
+    clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setCurrent((c) => (c + 1) % N)
+    }, 3500)
+  }, [])
+
+  useEffect(() => {
+    startTimer()
+    return () => clearInterval(timerRef.current)
+  }, [startTimer])
+
+  const go = (dir) => {
+    setCurrent((c) => (c + dir + N) % N)
+    startTimer()
+  }
+
   return (
     <section className="testimonials" aria-labelledby="testimonials-title">
       <h2 className="testimonials__title" id="testimonials-title">What Our Customers Say</h2>
-      <div className="testimonials__viewport">
-        <div className="testimonials__track" aria-hidden="false">
-          {TESTIMONIALS.map((t) => <Card key={t.id} t={t} />)}
-          {/* duplicate for seamless infinite loop */}
-          {TESTIMONIALS.map((t) => <Card key={`dup-${t.id}`} t={t} />)}
+
+      <div className="testimonials__carousel">
+        <button
+          className="testimonials__arrow testimonials__arrow--prev"
+          onClick={() => go(-1)}
+          aria-label="Previous testimonial"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        <div className="testimonials__viewport">
+          <div
+            className="testimonials__track"
+            style={{ transform: `translateX(-${current * CARD_STEP}px)` }}
+          >
+            {TESTIMONIALS.map((t) => <Card key={t.id} t={t} />)}
+          </div>
         </div>
+
+        <button
+          className="testimonials__arrow testimonials__arrow--next"
+          onClick={() => go(1)}
+          aria-label="Next testimonial"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <div className="testimonials__dots" role="tablist" aria-label="Testimonial navigation">
+        {TESTIMONIALS.map((t, i) => (
+          <button
+            key={t.id}
+            className={`testimonials__dot${i === current ? ' testimonials__dot--active' : ''}`}
+            onClick={() => { setCurrent(i); startTimer() }}
+            aria-label={`Go to testimonial ${i + 1}`}
+            aria-selected={i === current}
+            role="tab"
+          />
+        ))}
       </div>
     </section>
   )
