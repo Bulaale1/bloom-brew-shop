@@ -11,6 +11,7 @@ import LoginModal from './components/LoginModal'
 import Dashboard from './components/Dashboard'
 import Testimonials from './components/Testimonials'
 import Hero from './components/Hero'
+import Footer from './components/Footer'
 import './App.css'
 
 export default function App() {
@@ -131,6 +132,7 @@ export default function App() {
           onLogout={handleLogout}
         />
         <OrderConfirmation order={order} onNewOrder={() => setOrder(null)} />
+        <Footer />
       </>
     )
   }
@@ -185,6 +187,8 @@ export default function App() {
       {showLogin && (
         <LoginModal onSuccess={handleLoginSuccess} onClose={() => setShowLogin(false)} />
       )}
+
+      <Footer />
     </>
   )
 }
