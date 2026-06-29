@@ -44,7 +44,7 @@ const TESTIMONIALS = [
     name: 'Priya S.',
     initials: 'PS',
     rating: 5,
-    text: 'Tried the Mango Passion Smoothie and the Cinnamon Rolls on a whim — honestly one of the best decisions I've made this month.',
+    text: "Tried the Mango Passion Smoothie and the Cinnamon Rolls on a whim — honestly one of the best decisions I've made this month.",
     date: 'May 2026',
   },
   {
@@ -60,7 +60,7 @@ const TESTIMONIALS = [
     name: 'Fatima A.',
     initials: 'FA',
     rating: 5,
-    text: 'Bloom & Brew has the best Macchiato I've ever had outside of Italy. The Chocolate Cake is dense and rich — worth every cent.',
+    text: "Bloom & Brew has the best Macchiato I've ever had outside of Italy. The Chocolate Cake is dense and rich — worth every cent.",
     date: 'April 2026',
   },
   {
