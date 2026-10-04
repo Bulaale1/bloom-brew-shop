@@ -188,7 +188,7 @@ export default function Testimonials() {
 
   return (
     <section className="testimonials" aria-labelledby="testimonials-title">
-      <h2 className="testimonials__title" id="testimonials-title">What Our Customers Say</h2>
+      <h2 className="testimonials__title" id="testimonials-title">What our customers say</h2>
 
       <div className="testimonials__carousel">
         <button

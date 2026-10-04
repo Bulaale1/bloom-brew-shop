@@ -36,7 +36,7 @@ export default function Hero({ onShopNow }) {
       <div className="hero__visual" aria-hidden="true">
         <div className="hero__photo-frame">
           <img
-            src="https://picsum.photos/seed/warmcafe/560/680"
+            src="https://picsum.photos/seed/morninglight/560/680"
             alt=""
             className="hero__photo-img"
           />
