@@ -29,10 +29,13 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
 body {
   margin: 0;
   background: var(--brew-bg);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   color: var(--brew-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -43,7 +46,29 @@ body {
   flex-direction: column;
 }
 
-h1, h2, h3 { margin: 0; font-weight: 700; }
-p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: 700; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
 button { font-family: inherit; }
 ul { list-style: none; margin: 0; padding: 0; }
+
+*:focus-visible {
+  outline: 2px solid var(--brew-amber);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 16px;
+  background: var(--brew-amber);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 0 0 8px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 0; }

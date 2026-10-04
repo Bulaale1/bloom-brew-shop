@@ -18,6 +18,7 @@ const TESTIMONIALS = [
     id: 1,
     name: 'Sarah M.',
     initials: 'SM',
+    color: '#6b3f1e',
     rating: 5,
     text: 'Best coffee in town! The Caramel Latte is absolutely divine and the desserts are always fresh. Bloom & Brew is my go-to morning spot.',
     date: 'June 2026',
@@ -26,6 +27,7 @@ const TESTIMONIALS = [
     id: 2,
     name: 'James O.',
     initials: 'JO',
+    color: '#2d5a3d',
     rating: 5,
     text: 'The Cold Brew here is something else — smooth, bold, and perfectly chilled. I also tried the Tiramisu and it paired incredibly well.',
     date: 'May 2026',
@@ -34,6 +36,7 @@ const TESTIMONIALS = [
     id: 3,
     name: 'Amira K.',
     initials: 'AK',
+    color: '#5a3270',
     rating: 5,
     text: 'Ordered the Green Detox Smoothie and the Brownies — what a combo! Super easy to order and everything arrived fresh. Will definitely be back.',
     date: 'June 2026',
@@ -42,6 +45,7 @@ const TESTIMONIALS = [
     id: 4,
     name: 'Lena R.',
     initials: 'LR',
+    color: '#3d5a6b',
     rating: 5,
     text: 'The Vanilla Latte is perfection — creamy, not too sweet, just right. And the Cheesecake? Absolutely unreal. This place never disappoints.',
     date: 'April 2026',
@@ -50,6 +54,7 @@ const TESTIMONIALS = [
     id: 5,
     name: 'Marcus T.',
     initials: 'MT',
+    color: '#6b4a1a',
     rating: 5,
     text: 'I come here every morning before work. The Flat White is consistently excellent and the staff always has my order ready fast. 10/10.',
     date: 'June 2026',
@@ -58,6 +63,7 @@ const TESTIMONIALS = [
     id: 6,
     name: 'Priya S.',
     initials: 'PS',
+    color: '#5a4d2a',
     rating: 5,
     text: "Tried the Mango Passion Smoothie and the Cinnamon Rolls on a whim — honestly one of the best decisions I've made this month.",
     date: 'May 2026',
@@ -66,6 +72,7 @@ const TESTIMONIALS = [
     id: 7,
     name: 'Daniel W.',
     initials: 'DW',
+    color: '#2d4a6b',
     rating: 5,
     text: 'The Peanut Butter Banana Smoothie is incredible — thick, filling, and tastes like dessert. Perfect post-workout treat.',
     date: 'March 2026',
@@ -74,6 +81,7 @@ const TESTIMONIALS = [
     id: 8,
     name: 'Fatima A.',
     initials: 'FA',
+    color: '#6b3a3a',
     rating: 5,
     text: "Bloom & Brew has the best Macchiato I've ever had outside of Italy. The Chocolate Cake is dense and rich — worth every cent.",
     date: 'April 2026',
@@ -82,6 +90,7 @@ const TESTIMONIALS = [
     id: 9,
     name: 'Noah L.',
     initials: 'NL',
+    color: '#3a6b5a',
     rating: 5,
     text: 'Placed an order for the whole team — everyone loved it. Cappuccinos were spot on and the Cupcakes disappeared in minutes.',
     date: 'May 2026',
@@ -90,6 +99,7 @@ const TESTIMONIALS = [
     id: 10,
     name: 'Yuki H.',
     initials: 'YH',
+    color: '#6b5a2a',
     rating: 5,
     text: "The Affogato is a must-try — espresso poured over something magical. Simple, elegant, and absolutely satisfying. I'm a regular now.",
     date: 'June 2026',
@@ -111,7 +121,7 @@ const Card = ({ t }) => (
     <Stars count={t.rating} />
     <p className="testimonial__text">"{t.text}"</p>
     <div className="testimonial__author">
-      <div className="testimonial__avatar" aria-hidden="true">{t.initials}</div>
+      <div className="testimonial__avatar" aria-hidden="true" style={{ background: t.color }}>{t.initials}</div>
       <div>
         <div className="testimonial__name">{t.name}</div>
         <div className="testimonial__date">{t.date}</div>

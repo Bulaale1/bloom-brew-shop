@@ -17,10 +17,10 @@ const VALUES = [
 ]
 
 const STATS = [
-  { number: '5+',    label: 'Years serving' },
-  { number: '1 000+', label: 'Happy customers' },
-  { number: '30+',   label: 'Menu items' },
-  { number: '100%',  label: 'Made with love' },
+  { number: '5+',     label: 'Years brewing' },
+  { number: '1,200+', label: 'Happy customers' },
+  { number: '30+',    label: 'Menu items' },
+  { number: '4.9★',   label: 'Average rating' },
 ]
 
 export default function AboutUs() {
@@ -56,6 +56,13 @@ export default function AboutUs() {
 
         {/* Right — values */}
         <div className="about__values">
+          <div className="about__photo-wrap">
+            <img
+              src="https://picsum.photos/seed/coffeebar/800/400"
+              alt="Inside Bloom & Brew"
+              className="about__photo-img"
+            />
+          </div>
           {VALUES.map((v) => (
             <div key={v.title} className="about__value">
               <span className="about__value-icon" aria-hidden="true">{v.icon}</span>

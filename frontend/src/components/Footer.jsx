@@ -50,7 +50,7 @@ export default function Footer() {
             <h3 className="footer__col-title">Contact</h3>
             <ul className="footer__col-list">
               <li><a href="mailto:hello@bloomandbrew.com" className="footer__link">hello@bloomandbrew.com</a></li>
-              <li><a href="tel:+254700000000" className="footer__link">+254 700 000 000</a></li>
+              <li><a href="tel:+254720847193" className="footer__link">+254 720 847 193</a></li>
             </ul>
           </div>
         </div>
